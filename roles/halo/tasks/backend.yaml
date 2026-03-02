@@ -1,0 +1,21 @@
+---
+- name: Create backend directories
+  ansible.builtin.file:
+    path: "{{ halo_base_dir }}/backend"
+    state: directory
+    mode: "0755"
+
+- name: Fetch backend config
+  ansible.builtin.get_url:
+    url: "{{ halo_config_src }}/backend-{{ halo_product }}.yaml"
+    dest: "{{ halo_base_dir }}/backend/backend.yaml"
+    mode: "0644"
+  notify: restart backend
+
+- name: Run backend container
+  community.docker.docker_container:
+    name: halo-backend
+    image: "{{ halo_registry }}/halo-backend:{{ halo_inference_image_version }}"
+    restart_policy: unless-stopped
+    volumes:
+      - "{{ halo_base_dir }}/backend:/config:ro"

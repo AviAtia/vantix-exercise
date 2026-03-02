@@ -1,0 +1,25 @@
+---
+# Product line deployed by this role: lane | ct
+halo_product: lane
+
+# Kit installed on the host. Normally resolved from the kit by the Jenkins job.
+halo_kit_version: "4.9"
+
+# Image tag of the inference container, resolved from the kit.
+halo_inference_image_version: "4.9.0"
+
+# Where config files are fetched from. The offline flow repoints this to the USB stick.
+halo_config_src: "https://raw.git.vantix.example/platform/config/{{ halo_kit_version }}"
+
+halo_registry: registry.vantix.example
+halo_registry_token: "{{ vault_halo_registry_token }}"
+halo_site_key: "{{ vault_halo_site_key }}"
+
+halo_base_dir: /opt/halo
+
+# Inference container name differs per product.
+halo_inference_service: "{{ 'lane-inference' if halo_product == 'lane' else 'ct-detector' }}"
+
+halo_timezone: UTC
+# CT only: let the station follow the scanner's timezone (requires kit 4.5+).
+halo_timezone_auto: false

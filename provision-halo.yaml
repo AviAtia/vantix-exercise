@@ -1,0 +1,7 @@
+---
+- name: Provision Halo backends and stations
+  hosts: halo_backends:halo_stations
+  become: true
+  roles:
+    - role: halo
+      tags: [halo]

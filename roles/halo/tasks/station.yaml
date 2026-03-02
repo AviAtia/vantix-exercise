@@ -1,0 +1,44 @@
+---
+- name: Create station directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ halo_base_dir }}"
+    - "{{ halo_base_dir }}/config"
+    - "{{ halo_base_dir }}/packs"
+
+- name: Fetch station config
+  ansible.builtin.get_url:
+    url: "{{ halo_config_src }}/station-{{ halo_product }}.yaml"
+    dest: "{{ halo_base_dir }}/config/station.yaml"
+    mode: "0644"
+  notify: restart inference
+
+- name: Render station environment
+  ansible.builtin.template:
+    src: station.env.j2
+    dest: "{{ halo_base_dir }}/station.env"
+    mode: "0600"
+  no_log: true
+  diff: false
+  notify: restart inference
+
+- name: Follow scanner timezone
+  community.general.timezone:
+    name: "{{ halo_timezone }}"
+  when:
+    - halo_product == 'ct'
+    - halo_timezone_auto | bool
+    - halo_kit_version is version('4.5', '>=')
+
+- name: Run inference container
+  community.docker.docker_container:
+    name: "{{ halo_inference_service }}"
+    image: "{{ halo_registry }}/{{ halo_inference_service }}:{{ halo_inference_image_version }}"
+    restart_policy: unless-stopped
+    env_file: "{{ halo_base_dir }}/station.env"
+    volumes:
+      - "{{ halo_base_dir }}/packs/current:/packs:ro"
+      - "{{ halo_base_dir }}/config:/config:ro"

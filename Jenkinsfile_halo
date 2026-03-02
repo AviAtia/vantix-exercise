@@ -1,0 +1,41 @@
+// Triggered by SiteDesk with the setup's configuration as build parameters.
+pipeline {
+    agent { label 'ansible' }
+
+    parameters {
+        string(name: 'SITE', description: 'Site inventory name, e.g. northport')
+        choice(name: 'PRODUCT', choices: ['lane', 'ct'])
+        string(name: 'KIT_VERSION', description: 'Kit version, e.g. 4.9')
+        string(name: 'IMAGE_VERSION', description: 'Inference image tag resolved from the kit')
+        string(name: 'TIMEZONE', defaultValue: 'UTC')
+        string(name: 'LIMIT', defaultValue: 'all', description: 'Ansible --limit')
+        booleanParam(name: 'CHECK_MODE', defaultValue: true, description: 'Run with --check --diff')
+    }
+
+    stages {
+        stage('Render inventory') {
+            steps {
+                sh """
+                    cp inventories/jenkins-site.yaml inventory.yaml
+                    sed -i 's|replaceable-product|${params.PRODUCT}|' inventory.yaml
+                    sed -i 's|replaceable-kit-version|${params.KIT_VERSION}|' inventory.yaml
+                    sed -i 's|replaceable-image-version|${params.IMAGE_VERSION}|' inventory.yaml
+                    sed -i 's|replaceable-timezone|${params.TIMEZONE}|' inventory.yaml
+                """
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                withCredentials([file(credentialsId: 'halo-vault-prd', variable: 'VAULT_PASS')]) {
+                    sh """
+                        ansible-playbook provision-halo.yaml \
+                          -i inventory.yaml -i inventories/sites/${params.SITE}.yaml \
+                          --vault-password-file "\$VAULT_PASS" \
+                          -l '${params.LIMIT}' ${params.CHECK_MODE ? '--check --diff' : ''}
+                    """
+                }
+            }
+        }
+    }
+}

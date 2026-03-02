@@ -1,0 +1,8 @@
+# Template inventory rendered by Jenkinsfile_halo: every replaceable-* placeholder is replaced
+# with a build parameter. Hosts come from inventories/sites/<site>.yaml, layered after this file.
+all:
+  vars:
+    halo_product: replaceable-product
+    halo_kit_version: "replaceable-kit-version"
+    halo_inference_image_version: "replaceable-image-version"
+    halo_timezone: replaceable-timezone

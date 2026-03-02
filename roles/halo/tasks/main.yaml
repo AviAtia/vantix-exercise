@@ -1,0 +1,10 @@
+---
+- name: Backend
+  ansible.builtin.import_tasks: backend.yaml
+  when: "'halo_backends' in group_names"
+  tags: [backend, offline_upgrade]
+
+- name: Station
+  ansible.builtin.import_tasks: station.yaml
+  when: "'halo_stations' in group_names"
+  tags: [station, offline_upgrade]

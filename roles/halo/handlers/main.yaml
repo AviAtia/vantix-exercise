@@ -1,0 +1,10 @@
+---
+- name: Restart inference
+  ansible.builtin.command: docker restart {{ halo_inference_service }}
+  changed_when: true
+  listen: restart inference
+
+- name: Restart backend
+  ansible.builtin.command: docker restart halo-backend
+  changed_when: true
+  listen: restart backend
