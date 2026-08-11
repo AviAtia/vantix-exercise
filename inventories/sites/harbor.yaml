@@ -1,0 +1,14 @@
+# Harbor City Airport — CT checkpoint. Online over site VPN.
+all:
+  vars:
+    halo_product: ct
+    halo_timezone: America/New_York
+    halo_timezone_auto: true
+  children:
+    halo_backends:
+      hosts:
+        hb-be-01: {ansible_host: 10.52.0.10}
+    halo_stations:
+      hosts:
+        hb-ct-01: {ansible_host: 10.52.0.31}
+        hb-ct-02: {ansible_host: 10.52.0.32}
