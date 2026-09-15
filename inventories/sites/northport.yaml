@@ -1,0 +1,18 @@
+# Northport International Airport — Lane, terminal 2 checkpoint.
+# Air-gapped: no internet, no VPN. Upgraded on site from USB by field engineers.
+all:
+  vars:
+    halo_product: lane
+    halo_timezone: Europe/London
+  children:
+    halo_backends:
+      hosts:
+        np-be-01: {ansible_host: 10.40.0.10, halo_kit_version: "4.9"}
+    halo_stations:
+      hosts:
+        np-st-01: {ansible_host: 10.40.0.21, halo_kit_version: "4.9"}
+        np-st-02: {ansible_host: 10.40.0.22, halo_kit_version: "4.9"}
+        np-st-03: {ansible_host: 10.40.0.23, halo_kit_version: "4.6"}
+        np-st-04: {ansible_host: 10.40.0.24, halo_kit_version: "4.9"}
+        np-st-05: {ansible_host: 10.40.0.25, halo_kit_version: "4.6"}
+        np-st-06: {ansible_host: 10.40.0.26, halo_kit_version: "4.9"}
