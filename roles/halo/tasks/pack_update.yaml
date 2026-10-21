@@ -1,0 +1,54 @@
+---
+# Detector pack update.
+# Installs a new detector pack on a station without a full kit upgrade, so that
+# air-gapped sites can receive new detections from USB between kit releases.
+#
+# Packs are extracted into versioned directories under {{ halo_base_dir }}/packs
+# and the inference container reads the one that "current" points to.
+
+- name: Check kit version supports pack loader v2
+  ansible.builtin.set_fact:
+    halo_pack_supported: "{{ halo_kit_version >= '4.8' }}"
+
+- name: Fetch pack checksum manifest
+  ansible.builtin.get_url:
+    url: "https://raw.git.vantix.example/platform/packs/main/manifest.sha256"
+    dest: "{{ halo_base_dir }}/packs/manifest.sha256"
+    mode: "0644"
+  when: halo_pack_supported
+
+- name: Remove current detector pack
+  ansible.builtin.file:
+    path: "{{ halo_base_dir }}/packs/current"
+    state: absent
+  when: halo_pack_supported
+
+- name: Download detector pack
+  ansible.builtin.get_url:
+    url: "https://{{ halo_registry }}/packs/{{ halo_pack_version }}.tgz"
+    dest: "/tmp/{{ halo_pack_version }}.tgz"
+    mode: "0644"
+    headers:
+      Authorization: "Bearer {{ halo_registry_token }}"
+  when: halo_pack_supported
+
+- name: Extract detector pack
+  ansible.builtin.shell: >
+    mkdir -p {{ halo_base_dir }}/packs/{{ halo_pack_version }} &&
+    tar xzf /tmp/{{ halo_pack_version }}.tgz -C {{ halo_base_dir }}/packs/{{ halo_pack_version }}
+  when: halo_pack_supported
+  notify: Reload detector pack
+
+- name: Verify pack checksum
+  ansible.builtin.shell: >
+    cd /tmp &&
+    grep " {{ halo_pack_version }}.tgz$" {{ halo_base_dir }}/packs/manifest.sha256 | sha256sum -c -
+  changed_when: false
+  when: halo_pack_supported
+
+- name: Point current pack to new version
+  ansible.builtin.file:
+    src: "{{ halo_base_dir }}/packs/{{ halo_pack_version }}"
+    dest: "{{ halo_base_dir }}/packs/current"
+    state: link
+  when: halo_pack_supported
