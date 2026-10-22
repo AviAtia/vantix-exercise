@@ -52,3 +52,11 @@
     dest: "{{ halo_base_dir }}/packs/current"
     state: link
   when: halo_pack_supported
+
+- name: Render pack environment
+  ansible.builtin.template:
+    src: pack.env.j2
+    dest: "{{ halo_base_dir }}/pack.env"
+    mode: "0600"
+  when: halo_pack_supported
+  notify: Reload detector pack

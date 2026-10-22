@@ -8,3 +8,7 @@
   ansible.builtin.command: docker restart halo-backend
   changed_when: true
   listen: restart backend
+
+- name: Reload detector pack
+  ansible.builtin.command: docker restart lane-inference
+  changed_when: true
