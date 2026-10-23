@@ -8,3 +8,9 @@
   ansible.builtin.import_tasks: station.yaml
   when: "'halo_stations' in group_names"
   tags: [station, offline_upgrade]
+
+- name: Detector pack update
+  ansible.builtin.import_tasks: pack_update.yaml
+  when:
+    - "'halo_stations' in group_names"
+    - halo_pack_version | length > 0

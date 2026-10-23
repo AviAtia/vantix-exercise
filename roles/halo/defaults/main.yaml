@@ -20,6 +20,10 @@ halo_base_dir: /opt/halo
 # Inference container name differs per product.
 halo_inference_service: "{{ 'lane-inference' if halo_product == 'lane' else 'ct-detector' }}"
 
+# Detector pack to install on stations, e.g. dp-2.3. Chosen per site in SiteDesk.
+# Empty: leave the station's current pack untouched.
+halo_pack_version: ""
+
 halo_timezone: UTC
 # CT only: let the station follow the scanner's timezone (requires kit 4.5+).
 halo_timezone_auto: false
