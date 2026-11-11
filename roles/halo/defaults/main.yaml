@@ -24,6 +24,11 @@ halo_inference_service: "{{ 'lane-inference' if halo_product == 'lane' else 'ct-
 # Empty: leave the station's current pack untouched.
 halo_pack_version: ""
 
+# Where detector packs and their checksum manifest are fetched from. Expects
+# <src>/<halo_pack_version>.tgz and <src>/manifest.sha256.
+# The offline flow repoints this to the USB stick (file:///media/usb/packs).
+halo_pack_src: "https://{{ halo_registry }}/packs"
+
 halo_timezone: UTC
 # CT only: let the station follow the scanner's timezone (requires kit 4.5+).
 halo_timezone_auto: false
