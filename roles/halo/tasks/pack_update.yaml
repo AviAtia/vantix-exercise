@@ -44,6 +44,24 @@
   when: halo_pack_supported
   notify: Reload detector pack
 
+- name: Check where current points today
+  ansible.builtin.stat:
+    path: "{{ halo_base_dir }}/packs/current"
+  register: halo_pack_current
+  when: halo_pack_supported
+
+# Remember the pack that is about to be replaced, so it can be switched back
+# without knowing its version. Skipped on a rerun of the same version.
+- name: Remember the previous pack
+  ansible.builtin.file:
+    src: "{{ halo_pack_current.stat.lnk_source }}"
+    dest: "{{ halo_base_dir }}/packs/previous"
+    state: link
+  when:
+    - halo_pack_supported
+    - halo_pack_current.stat.islnk | default(false)
+    - halo_pack_current.stat.lnk_source != halo_base_dir ~ '/packs/' ~ halo_pack_version
+
 - name: Point current pack to new version
   ansible.builtin.file:
     src: "{{ halo_base_dir }}/packs/{{ halo_pack_version }}"
