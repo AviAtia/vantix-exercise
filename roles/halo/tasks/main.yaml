@@ -14,3 +14,4 @@
   when:
     - "'halo_stations' in group_names"
     - halo_pack_version | length > 0
+  tags: [pack, offline_upgrade]
