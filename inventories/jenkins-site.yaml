@@ -6,3 +6,4 @@ all:
     halo_kit_version: "replaceable-kit-version"
     halo_inference_image_version: "replaceable-image-version"
     halo_timezone: replaceable-timezone
+    halo_pack_version: replaceable-pack-version

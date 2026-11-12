@@ -8,6 +8,7 @@ pipeline {
         string(name: 'KIT_VERSION', description: 'Kit version, e.g. 4.9')
         string(name: 'IMAGE_VERSION', description: 'Inference image tag resolved from the kit')
         string(name: 'TIMEZONE', defaultValue: 'UTC')
+        string(name: 'PACK_VERSION', defaultValue: '', description: 'Detector pack, e.g. dp-2.3. Set per setup in SiteDesk')
         string(name: 'LIMIT', defaultValue: 'all', description: 'Ansible --limit')
         booleanParam(name: 'CHECK_MODE', defaultValue: true, description: 'Run with --check --diff')
     }

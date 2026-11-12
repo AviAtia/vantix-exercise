@@ -51,6 +51,35 @@ Consequences for role code:
   repoint at the USB stick. Add a new one (and wire it into `tools/offline-upgrade`) if needed.
 * Tasks the offline flow must run need the `offline_upgrade` tag.
 
+## Rolling back a detector pack update
+
+Packs live in versioned directories under `/opt/halo/packs/`. `current` is a symlink to
+the active pack and `previous` is a symlink to the pack that `current` replaced. Old pack
+directories are never deleted. To see what a station runs:
+
+```
+ls -l /opt/halo/packs
+```
+
+To go back to the previous pack on a station, without a USB stick or network:
+
+```
+cd /opt/halo/packs
+ln -sfn "$(readlink previous)" current
+docker restart lane-inference
+```
+
+Or re-run the update from the USB stick with the old pack version, which needs the old pack
+and its line in `manifest.sha256` on the stick:
+
+```
+ansible-playbook provision-halo.yaml -i <site inventory> --tags offline_upgrade \
+  -e halo_pack_src=file:///media/usb/packs -e halo_pack_version=<old version>
+```
+
+Check afterwards that the station really runs the old pack. A kit rollback only swaps the
+images and config, not the pack.
+
 ## Conventions
 
 * A second run must report no changes.

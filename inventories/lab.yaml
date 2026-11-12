@@ -1,0 +1,9 @@
+# Lab station in the office. Has internet access.
+all:
+  vars:
+    halo_product: lane
+    halo_kit_version: "4.9"
+  children:
+    halo_stations:
+      hosts:
+        st-lab-02: {ansible_host: 192.168.50.12}
